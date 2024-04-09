@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, Pressable, SafeAreaView, Dimensions } from 'react-native';
+import Pause from './Pause';
 
 const window = Dimensions.get("window");
 
@@ -10,8 +11,9 @@ export default function App({navigation}) {
         <StatusBar style="auto" />
 
         <Image style={{width:390/411*window.width, height:111/867*window.height, objectFit:'fill', position:'absolute', top:50}} source={require('./assets/orderBar.png')} />
-        <Pressable onPress={() => navigation.goBack()}>
-        <Image style={{width:50/411*window.width, height:50/867*window.height, objectFit:'fill', position:'absolute', top:80, left:330/411*window.width}} source={require('./assets/pause.png')} />
+
+        <Pressable style={{ position:'absolute', top:80, left:330/411*window.width}} onPress={() => navigation.navigate('Pause')}>
+        <Image style={{width:50/411*window.width, height:50/867*window.height, objectFit:'fill'}} source={require('./assets/pause.png')} />
         </Pressable>
         
         <Image style={{width:245/411*window.width, height:548/867*window.height, objectFit:'fill', position:'absolute', top:200, left:10}} source={require('./assets/board.png')} />
