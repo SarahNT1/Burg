@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from './Home';
 import Play from './Play';
 import Settings from './Settings';
+import Pause from './Pause';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,10 @@ export default function App() {
           animationTypeForReplace:'pop',
           animation:'slide_from_right'}} /> 
         <Stack.Screen name="Settings" component={Settings}
+        options={{headerShown:false,
+          animationTypeForReplace:'pop',
+          animation:'slide_from_bottom'}} />
+        <Stack.Screen name="Pause" component={Pause}
         options={{headerShown:false,
           animationTypeForReplace:'pop',
           animation:'slide_from_bottom'}} />
