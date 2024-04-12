@@ -52,8 +52,6 @@ export default function App({navigation}) {
         <Pressable onPress={toggleSfx} style={{top:465/867*window.height, left:237/411*window.width, position:'absolute'}} >
         <Image style={{width:90/411*window.width, height:90/867*window.height, objectFit:'fill'}} source={sfxSource} />
         </Pressable>
-
-        <Text style={styles.note}>*Music will be implemented in the next update</Text>
         
         <Pressable style={{position:'absolute', top:700/867*window.height, left:110/411*window.width}} onPress={() => BackHandler.exitApp()}>
         <Image style={{width:196/411*window.width, height:83/867*window.height}} source={require('./assets/exit.png')} />
@@ -74,11 +72,4 @@ const styles = StyleSheet.create({
       alignItems: 'center'
     },
 
-    note: {
-        fontSize: 10,
-        color: 'black',
-        fontWeight: '100',
-        opacity: 1,
-        bottom: 90/867*window.height
-    }
     });

@@ -101,7 +101,6 @@ const ingredientList = ['Bottom Bun', 'Tomato', 'Patty', 'Cheese', 'Onion', 'Let
   }
 
   const handleRightClick =async()=>{
-    console.log(settings);
     let correct = true;
     if(onBoard.length != generatedIngredients.length){
       correct = false;
