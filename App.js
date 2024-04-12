@@ -4,9 +4,7 @@ import Home from './Home';
 import Play from './Play';
 import Settings from './Settings';
 import Pause from './Pause';
-
 const Stack = createNativeStackNavigator();
-//test git change
 
 export default function App() {
   return (

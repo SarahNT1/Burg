@@ -1,27 +1,41 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Image, Pressable, SafeAreaView, Dimensions, BackHandler, Text } from 'react-native';
 import { useState } from 'react';
+import { useSettingsStore } from './hooks';
 
 const window = Dimensions.get("window");
 
 export default function App({navigation}) {
-    const [music, setMusic] = useState(require('./assets/musicOn.png'));
-    const [sfx, setSfx] = useState(require('./assets/sfxOn.png'));
+    const musicSource = useSettingsStore((state) => state.musicSource);
+    const sfxSource = useSettingsStore((state) => state.sfxSource);
+    const settings = useSettingsStore((state) => state.settings);
+
+    const toggleM = useSettingsStore((state) => state.toggleMusic);
+    const toggleS = useSettingsStore((state) => state.toggleSfx);
+    const toggleMS = useSettingsStore((state) => state.changeMSource);
+    const toggleSS = useSettingsStore((state) => state.changeSSource);
+
 
     const toggleMusic = () => {
-        if(music === require('./assets/musicOn.png')) {
-            setMusic(require('./assets/musicOff.png'));
-        } else {
-            setMusic(require('./assets/musicOn.png'));
-        }
+        // if(music === require('./assets/musicOn.png')) {
+        //     setMusic(require('./assets/musicOff.png'));
+        // } else {
+        //     setMusic(require('./assets/musicOn.png'));
+        // }
+        toggleM();
+        toggleMS();
     }
 
     const toggleSfx = () => {
-        if(sfx === require('./assets/sfxOn.png')) {
-            setSfx(require('./assets/sfxOff.png'));
-        } else {
-            setSfx(require('./assets/sfxOn.png'));
-        }
+        // if(sfx === require('./assets/sfxOn.png')) {
+        //     setSfx(require('./assets/sfxOff.png'));
+        //     setSound([sound[0], true]);
+        // } else {
+        //     setSfx(require('./assets/sfxOn.png'));
+        //     setSound([sound[0], false]);
+        // }
+        toggleS();
+        toggleSS();
     }
 
   return (
@@ -32,11 +46,11 @@ export default function App({navigation}) {
         <Image style={{width:331/411*window.width, height:496/867*window.height, objectFit:'fill', top:150/867*window.height}} source={require('./assets/settingsBox.png')} />
 
         <Pressable onPress={toggleMusic} style={{top:465/867*window.height, left:87/411*window.width, position:'absolute'}} >
-        <Image style={{width:90/411*window.width, height:90/867*window.height, objectFit:'fill'}} source={music} />
+        <Image style={{width:90/411*window.width, height:90/867*window.height, objectFit:'fill'}} source={musicSource} />
         </Pressable>
 
         <Pressable onPress={toggleSfx} style={{top:465/867*window.height, left:237/411*window.width, position:'absolute'}} >
-        <Image style={{width:90/411*window.width, height:90/867*window.height, objectFit:'fill'}} source={sfx} />
+        <Image style={{width:90/411*window.width, height:90/867*window.height, objectFit:'fill'}} source={sfxSource} />
         </Pressable>
 
         <Text style={styles.note}>*Music will be implemented in the next update</Text>

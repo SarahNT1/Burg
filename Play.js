@@ -1,18 +1,22 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, Pressable, SafeAreaView, Dimensions, Text } from 'react-native';
-import Pause from './Pause';
 import Ticket from './Ticket';
-import Draggable from 'react-draggable';
+import { Audio } from 'expo-av';
+import { useSettingsStore } from './hooks';
 
 const window = Dimensions.get("window");
 
 export default function App({navigation}) {
+
   const[start, setStart] = useState(true);
   const[ticketNum, setTicketNum] = useState(1);
   const[generatedIngredients, setGeneratedIngredients] = useState([]);
   const[onBoard, setOnBoard] = useState([]);
   const[score, setScore] = useState(0);
+  const [sound, setSound] = useState();
+  const [bgMusic, setBgMusic] = useState();
+  const settings = useSettingsStore((state) => state.settings);
 
   const stackSource = [
     require('./assets/bunStack.png'),
@@ -53,13 +57,51 @@ const ingredientList = ['Bottom Bun', 'Tomato', 'Patty', 'Cheese', 'Onion', 'Let
     }
     setGeneratedIngredients(ingredients);
   }
+  
+
+  const playSound = async(source) => {
+    console.log('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync(source);
+    setSound(sound);
+    
+    console.log('Playing Sound');
+      sound.playAsync();
+  }
+
+  const playBgMusic = async() => {
+    console.log('Loading bgMusic');
+    const { sound } = await Audio.Sound.createAsync(require('./assets/bgMusic.mp3'));
+    setBgMusic(sound);
+
+    sound.setIsLoopingAsync(true);
+    console.log('Playing bgMusic');
+    sound.playAsync();
+  }
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log('Unloading Sound');
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
+  useEffect(() => {
+    return bgMusic
+      ? () => {
+          console.log('Unloading bgMusic');
+          bgMusic.unloadAsync();
+        }
+      : undefined;
+  }, [bgMusic]);
 
   const handleStackClick =(index)=>{
     setOnBoard([...onBoard, ingredientList[ingredientList.length - 1 - index]]);
-    console.log(onBoard);
   }
 
-  const handleRightClick =()=>{
+  const handleRightClick =async()=>{
+    console.log(settings);
     let correct = true;
     if(onBoard.length != generatedIngredients.length){
       correct = false;
@@ -73,14 +115,21 @@ const ingredientList = ['Bottom Bun', 'Tomato', 'Patty', 'Cheese', 'Onion', 'Let
     }
 
     if(correct){
+      let sound = require('./assets/ding.mp3');
       setTicketNum(ticketNum + 1);
       setOnBoard([]);
       setScore(score + 1);
       generateIngredientsList();
+      if(!settings[1]){
+        playSound(sound);
+      }
     }
     else{
-      alert('Incorrect! MAKE IT AGAIN!');
+      let sound = require('./assets/buzzer.mp3');
       setOnBoard([]);
+      if(!settings[1]){
+        playSound(sound);
+      }
     }
   }
 
@@ -88,6 +137,17 @@ const ingredientList = ['Bottom Bun', 'Tomato', 'Patty', 'Cheese', 'Onion', 'Let
     setStart(false);
     generateIngredientsList();
   }
+
+  useEffect(() => {
+    if (!settings[0]) {
+      playBgMusic();
+    }
+    else{
+      if(bgMusic){
+        bgMusic.unloadAsync();
+      }
+    }
+  }, [settings[0]]);
 
   return (
     <SafeAreaView style={styles.container}>
