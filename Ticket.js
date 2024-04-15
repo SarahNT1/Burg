@@ -3,7 +3,7 @@ import { useState } from "react";
 
 const window = Dimensions.get("window");
 
-export default function Ticket({ingredients, ticketNum}){
+export default function Ticket({ingredients, ticketNum, ticketPos}){
     const[pressed, setPressed] = useState(false);
     const imageSource = {
         'Top Bun': require('./assets/bun.png'),
@@ -19,7 +19,7 @@ export default function Ticket({ingredients, ticketNum}){
         <View>
             <View>
                 {pressed && (
-                    <Pressable style={{position: 'absolute', top:180, left: 105, zIndex:2}} onPress={() => setPressed(false)}>
+                    <Pressable style={{position: 'absolute', top:180, left: 105, zIndex:5}} onPress={() => setPressed(false)}>
                         <View style={{width: 200/411*window.width, height: 480/867*window.height, backgroundColor: 'white', borderWidth: 2, borderColor: 'gray', flex: 1, flexDirection: 'column-reverse', justifyContent: 'center', alignItems: 'center'}}>
                             {ingredients.map((ingredient, index) => (
                                 <View key={index}>
@@ -30,7 +30,7 @@ export default function Ticket({ingredients, ticketNum}){
                     </Pressable>
                 )}
             </View>
-            <Pressable style={{position: 'absolute', top:65, left: 35}} onPress={() => setPressed(true)}>
+            <Pressable style={{position: 'absolute', top:ticketPos, left: 35}} onPress={() => setPressed(true)}>
                 <View style={{backgroundColor: 'white', borderWidth: 2, borderColor: 'gray', width: 60/411*window.width, height: 105/867*window.height, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                     <Text style={{fontSize: 25}}>
                         {ticketNum}

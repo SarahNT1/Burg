@@ -17,12 +17,16 @@ export default function App({navigation}) {
   const [sound, setSound] = useState();
   const [bgMusic, setBgMusic] = useState();
   const settings = useSettingsStore((state) => state.settings);
+  const[buttonPos, setButtonPos] = useState(220);
+  const[boardPos, setBoardPos] = useState(200);
+  const[ingPos, setIngPos] = useState(210);
+  const[ticketPos, setTicketPos] = useState(65);
 
   const stackSource = [
     require('./assets/bunStack.png'),
     require('./assets/lettuceStack.png'),
     require('./assets/onionStack.png'),
-     require('./assets/cheeseStack.png'),
+    require('./assets/cheeseStack.png'),
     require('./assets/pattyStack.png'), 
     require('./assets/tomatoStack.png'),
     require('./assets/botBunStack.png')
@@ -133,6 +137,12 @@ const ingredientList = ['Bottom Bun', 'Tomato', 'Patty', 'Cheese', 'Onion', 'Let
   }
 
   if(start){
+    if(window.height <= 736){
+      setButtonPos(170);
+      setBoardPos(175);
+      setIngPos(160);
+      setTicketPos(40);
+    }
     setStart(false);
     generateIngredientsList();
   }
@@ -162,18 +172,18 @@ const ingredientList = ['Bottom Bun', 'Tomato', 'Patty', 'Cheese', 'Onion', 'Let
         </Pressable>
 
         
-        <Ticket ingredients={generatedIngredients} ticketNum={ticketNum}/>
+        <Ticket ingredients={generatedIngredients} ticketNum={ticketNum} ticketPos={ticketPos}/>
         
-        <View style={{width:245/411*window.width, height:450/867*window.height, position:'absolute', zIndex:1, top:235, left:80, flex:1, flexDirection:'column-reverse', justifyContent:'flex-start'}}>
+        <View style={{width:245/411*window.width, height:450/867*window.height, position:'absolute', zIndex:-1, top:235, left:80, flex:1, flexDirection:'column-reverse', justifyContent:'flex-start'}}>
         {onBoard.map((ingredient, index) => (
                                 <View key={index}>
                                     <Image style={{width: 90/411*window.width, height: 66/867*window.height, objectFit: 'fill', left: 5}} source={imageSource[ingredient]}/>
                                 </View>
                             ))}
         </View>
-        <Image style={{width:245/411*window.width, height:548/867*window.height, objectFit:'fill', position:'absolute', top:200, left:10}} source={require('./assets/board.png')} />
+        <Image style={{width:245/411*window.width, height:548/867*window.height, objectFit:'fill', position:'absolute', top:boardPos, left:10, zIndex:-2}} source={require('./assets/board.png')} />
 
-        <View style={{display:'flex', justifyContent:'space-between', flexDirection:'column', top:200, height:542/867*window.height}}>
+        <View style={{display:'flex', justifyContent:'space-between', flexDirection:'column', top:ingPos, height:542/867*window.height, zIndex:-1}}>
         {stackSource.map((source, index) => (
           <View key={index}>
             <Pressable style={{left:286}} onPress={() => handleStackClick(index)}>
@@ -183,7 +193,7 @@ const ingredientList = ['Bottom Bun', 'Tomato', 'Patty', 'Cheese', 'Onion', 'Let
         ))}
         </View>
 
-        <View style={{display:'flex', justifyContent:'space-around', top:220, flexDirection:'row', left:-4}}>
+        <View style={{display:'flex', justifyContent:'space-around', top:buttonPos, flexDirection:'row', left:-4}}>
         <Pressable onPress={() => setOnBoard([])}>
         <Image style={{width:170/411*window.width, height:91/867*window.height, objectFit:'fill'}} source={require('./assets/btnWrong.png')} />
         </Pressable>

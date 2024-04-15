@@ -10,7 +10,10 @@ export default function App({navigation}) {
       <Image style={styles.mouth} source={require('./assets/mouth.png')} />
       {/* <Text style={{top:100}}>{window.width}</Text>
       <Text style={{top:100}}>{window.height}</Text> */}
-      <Image style={styles.table} source={require('./assets/table.png')} />
+      {window.height <= 736 ? (
+        <Image style={{width: 290/411*window.width, height: 425/867*window.height, top: 175, objectFit: 'fill'}} source={require('./assets/table.png')} />
+      ) : (<Image style={{width: 290/411*window.width, height: 425/867*window.height, top: 195, objectFit: 'fill'}} source={require('./assets/table.png')} />)}
+      
       <View style={{display:'flex', justifyContent:'space-between', flexDirection:'row'}} >
         <Pressable onPress={() => navigation.navigate('Play')}>
             <Image style={styles.play} source={require('./assets/play.png')} />
@@ -47,12 +50,12 @@ const styles = StyleSheet.create({
     objectFit: 'fill',
   },
 
-  table: {
-    width: 290/411*window.width,
-    height: 425/867*window.height,
-    top: 195,
-    objectFit: 'fill',
-  },
+  // table: {
+  //   width: 290/411*window.width,
+  //   height: 425/867*window.height,
+  //   top: 195,
+  //   objectFit: 'fill',
+  // },
 
   play: {
     width: 157/411*window.width,
