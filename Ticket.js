@@ -5,6 +5,7 @@ const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
 
 
+
 export default function Ticket({ingredients, ticketNum, ticketPos}){
     const[pressed, setPressed] = useState(false);
     const imageSource = {
@@ -23,8 +24,10 @@ export default function Ticket({ingredients, ticketNum, ticketPos}){
             <View>
                 {pressed && (
 
+
                     <Pressable style={{position:'absolute', zIndex:5, width:screen.width, height:screen.height}} onPress={() => setPressed(false)}>
                         <View style={{position:'absolute', top:180, left:105,  backgroundColor: 'white', width: 200/411*window.width, height: 480/867*window.height, borderWidth: 2, borderColor: 'gray', flex: 1, flexDirection: 'column-reverse', justifyContent: 'center', alignItems: 'center'}}>
+
 
                             {ingredients.map((ingredient, index) => (
                                 <View key={index}>
