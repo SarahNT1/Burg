@@ -2,6 +2,8 @@ import { StyleSheet, View, Text, Image, Pressable, SafeAreaView, Dimensions, Ale
 import { useState } from "react";
 
 const window = Dimensions.get("window");
+const screen = Dimensions.get("screen");
+
 
 export default function Ticket({ingredients, ticketNum, ticketPos}){
     const[pressed, setPressed] = useState(false);
@@ -13,14 +15,17 @@ export default function Ticket({ingredients, ticketNum, ticketPos}){
         'Patty': require('./assets/patty.png'), 
         'Tomato': require('./assets/tomato.png'),
         'Bottom Bun': require('./assets/botBun.png')
+
     }
 
     return (
         <View>
             <View>
                 {pressed && (
-                    <Pressable style={{position: 'absolute', top:180, left: 105, zIndex:5}} onPress={() => setPressed(false)}>
-                        <View style={{width: 200/411*window.width, height: 480/867*window.height, backgroundColor: 'white', borderWidth: 2, borderColor: 'gray', flex: 1, flexDirection: 'column-reverse', justifyContent: 'center', alignItems: 'center'}}>
+
+                    <Pressable style={{position:'absolute', zIndex:5, width:screen.width, height:screen.height}} onPress={() => setPressed(false)}>
+                        <View style={{position:'absolute', top:180, left:105,  backgroundColor: 'white', width: 200/411*window.width, height: 480/867*window.height, borderWidth: 2, borderColor: 'gray', flex: 1, flexDirection: 'column-reverse', justifyContent: 'center', alignItems: 'center'}}>
+
                             {ingredients.map((ingredient, index) => (
                                 <View key={index}>
                                     <Image style={{width: 90/411*window.width, height: 66/867*window.height, objectFit: 'fill', left: 5}} source={imageSource[ingredient]}/>
@@ -30,8 +35,10 @@ export default function Ticket({ingredients, ticketNum, ticketPos}){
                     </Pressable>
                 )}
             </View>
+
             <Pressable style={{position: 'absolute', top:ticketPos, left: 35}} onPress={() => setPressed(true)}>
                 <View style={{backgroundColor: 'white', borderWidth: 2, borderColor: 'gray', width: 60/411*window.width, height: 105/867*window.height, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+
                     <Text style={{fontSize: 25}}>
                         {ticketNum}
                     </Text>
