@@ -68,6 +68,7 @@ const imageSource = [
 ]
 
 
+
   const generateIngredientsList =()=>{
     let randNum = 0;
     const ingredients = [];
@@ -181,9 +182,7 @@ const imageSource = [
 
 
   const handleDrag =(e, ui)=>{
-    // temp = [...visibility];
-    // temp[index] = 1;
-    // setVisibility(temp);
+
     
     if(ui.dx < -180){
       e.preventDefault();
