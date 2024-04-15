@@ -8,8 +8,6 @@ export default function App({navigation}) {
     <SafeAreaView style={styles.container}>
       <Image style={styles.burg} source={require('./assets/title.png')} />
       <Image style={styles.mouth} source={require('./assets/mouth.png')} />
-      {/* <Text style={{top:100}}>{window.width}</Text>
-      <Text style={{top:100}}>{window.height}</Text> */}
       {window.height <= 736 ? (
         <Image style={{width: 290/411*window.width, height: 425/867*window.height, top: 175, objectFit: 'fill'}} source={require('./assets/table.png')} />
       ) : (<Image style={{width: 290/411*window.width, height: 425/867*window.height, top: 195, objectFit: 'fill'}} source={require('./assets/table.png')} />)}
@@ -50,12 +48,6 @@ const styles = StyleSheet.create({
     objectFit: 'fill',
   },
 
-  // table: {
-  //   width: 290/411*window.width,
-  //   height: 425/867*window.height,
-  //   top: 195,
-  //   objectFit: 'fill',
-  // },
 
   play: {
     width: 157/411*window.width,
