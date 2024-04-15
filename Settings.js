@@ -17,23 +17,11 @@ export default function App({navigation}) {
 
 
     const toggleMusic = () => {
-        // if(music === require('./assets/musicOn.png')) {
-        //     setMusic(require('./assets/musicOff.png'));
-        // } else {
-        //     setMusic(require('./assets/musicOn.png'));
-        // }
         toggleM();
         toggleMS();
     }
 
     const toggleSfx = () => {
-        // if(sfx === require('./assets/sfxOn.png')) {
-        //     setSfx(require('./assets/sfxOff.png'));
-        //     setSound([sound[0], true]);
-        // } else {
-        //     setSfx(require('./assets/sfxOn.png'));
-        //     setSound([sound[0], false]);
-        // }
         toggleS();
         toggleSS();
     }
