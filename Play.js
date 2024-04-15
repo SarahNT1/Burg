@@ -1,12 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { StyleSheet, View, Image, Pressable, SafeAreaView, Dimensions, Text, Alert } from 'react-native';
-import Ticket from './Ticket';
 import Draggable from 'react-native-draggable';
+import { useState, useEffect } from 'react';
+import { StyleSheet, View, Image, Pressable, SafeAreaView, Dimensions, Text } from 'react-native';
+import Ticket from './Ticket';
+import { Audio } from 'expo-av';
+import { useSettingsStore } from './hooks';
 
 const window = Dimensions.get("window");
 
 export default function App({navigation}) {
+
   const[instructions, setInstructions] = useState(true);
   const[start, setStart] = useState(true);
   const[ticketNum, setTicketNum] = useState(1);
@@ -20,18 +23,41 @@ export default function App({navigation}) {
     'Top Bun'
   ];
   const[generatedIngredients, setGeneratedIngredients] = useState([]);
-  const[board, setBoard] = useState([]);
   const[selected, setSelected] = useState('');
-  const imageSource = {
-    'Top Bun': require('./assets/bunStack.png'),
-    'Lettuce': require('./assets/lettuceStack.png'),
-    'Onion': require('./assets/onionStack.png'),
-    'Cheese': require('./assets/cheeseStack.png'),
-    'Patty': require('./assets/pattyStack.png'), 
-    'Tomato': require('./assets/tomatoStack.png'),
-    'Bottom Bun': require('./assets/botBunStack.png')
-  };
   
+
+  const[onBoard, setOnBoard] = useState([]);
+  const[score, setScore] = useState(0);
+  const [sound, setSound] = useState();
+  const [bgMusic, setBgMusic] = useState();
+  const settings = useSettingsStore((state) => state.settings);
+  const[buttonPos, setButtonPos] = useState(220);
+  const[boardPos, setBoardPos] = useState(200);
+  const[ingPos, setIngPos] = useState(210);
+  const[ticketPos, setTicketPos] = useState(65);
+
+  const stackSource = [
+    require('./assets/bunStack.png'),
+    require('./assets/lettuceStack.png'),
+    require('./assets/onionStack.png'),
+    require('./assets/cheeseStack.png'),
+    require('./assets/pattyStack.png'), 
+    require('./assets/tomatoStack.png'),
+    require('./assets/botBunStack.png')
+  ]
+
+  const imageSource = {
+    'Top Bun': require('./assets/bun.png'),
+    'Lettuce': require('./assets/lettuce.png'),
+    'Onion': require('./assets/onion.png'),
+    'Cheese': require('./assets/cheese.png'),
+    'Patty': require('./assets/patty.png'), 
+    'Tomato': require('./assets/tomato.png'),
+    'Bottom Bun': require('./assets/botBun.png')
+}
+const ingredientList = ['Bottom Bun', 'Tomato', 'Patty', 'Cheese', 'Onion', 'Lettuce', 'Top Bun'];
+
+
   const generateIngredientsList =()=>{
     let randNum = 0;
     const ingredients = [];
@@ -51,47 +77,98 @@ export default function App({navigation}) {
     setGeneratedIngredients(ingredients);
   }
 
-  const correct =()=>{
-    let equal = true;
 
-    if(board.length == generatedIngredients.length){
-
-      for(let i = 0; i < 7; i++){
-        if(board[i] != generatedIngredients[i]){
-          equal = false;
-          break;
-        }
-      }
-      return equal;
-    }
-
-    return false;
-  }
-
-  const handleButtonClick =()=>{
-    generateIngredientsList();
-    if(correct()){
-      Alert.alert('Correct!');
-    }
-    else{
-      Alert.alert('Incorrect.');
-    }
-    setBoard([]);
-  }
-
-  const handleWrongClick =()=>{
-    setBoard([]);
-  }
 
   const instructionToggle =()=>{
     setInstructions(false);
   }
 
+
+  
+
+  const playSound = async(source) => {
+    console.log('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync(source);
+    setSound(sound);
+    
+    console.log('Playing Sound');
+      sound.playAsync();
+  }
+
+  const playBgMusic = async() => {
+    console.log('Loading bgMusic');
+    const { sound } = await Audio.Sound.createAsync(require('./assets/bgMusic.mp3'));
+    setBgMusic(sound);
+
+    sound.setIsLoopingAsync(true);
+    console.log('Playing bgMusic');
+    sound.playAsync();
+  }
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log('Unloading Sound');
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
+  useEffect(() => {
+    return bgMusic
+      ? () => {
+          console.log('Unloading bgMusic');
+          bgMusic.unloadAsync();
+        }
+      : undefined;
+  }, [bgMusic]);
+
+
+  const handleRightClick =async()=>{
+    let correct = true;
+    if(onBoard.length != generatedIngredients.length){
+      correct = false;
+    }
+    else{
+      for(let i = 0; i < onBoard.length; i++){
+        if(onBoard[i] != generatedIngredients[i]){
+          correct = false;
+        }
+      }
+    }
+
+    if(correct){
+      let sound = require('./assets/ding.mp3');
+      setTicketNum(ticketNum + 1);
+      setOnBoard([]);
+      setScore(score + 1);
+      generateIngredientsList();
+      if(!settings[1]){
+        playSound(sound);
+      }
+    }
+    else{
+      let sound = require('./assets/buzzer.mp3');
+      setOnBoard([]);
+      if(!settings[1]){
+        playSound(sound);
+      }
+    }
+  }
+
   if(start){
+    if(window.height <= 736){
+      setButtonPos(170);
+      setBoardPos(175);
+      setIngPos(160);
+      setTicketPos(40);
+    }
+
     setTimeout(instructionToggle, 5000);
     setStart(false);
     generateIngredientsList();
   }
+
 
   const handleDrag =(e, ui)=>{
     if(ui.dx < -180){
@@ -104,62 +181,95 @@ export default function App({navigation}) {
     }
   }
 
+  useEffect(() => {
+    if (!settings[0]) {
+      playBgMusic();
+    }
+    else{
+      if(bgMusic){
+        bgMusic.unloadAsync();
+      }
+    }
+  }, [settings[0]]);
+
+
   return (
     <SafeAreaView style={styles.container}>
+    <StatusBar style="auto" />
+        <Text style={{position:'absolute', top:30, left:20, fontSize:20}}>Score: {score}</Text>
 
-        <StatusBar style="auto" />
+        <View style={{position:'absolute', top:50}}>
+          <Image style={{width:390/411*window.width, height:111/867*window.height, objectFit:'fill'}} source={require('./assets/orderBar.png')} />
+        </View>
 
-        <Image style={{width:390/411*window.width, height:111/867*window.height, objectFit:'fill', position:'absolute', top:50}} source={require('./assets/orderBar.png')} />
-        <Pressable onPress={() => navigation.goBack()} style={{position: 'absolute', top: 80, left: 330/411*window.width}}>
+
+
+        <Pressable style={{ position:'absolute', top:80, left:330/411*window.width}} onPress={() => navigation.navigate('Pause')}>
           <Image style={{width:50/411*window.width, height:50/867*window.height, objectFit:'fill'}} source={require('./assets/pause.png')} />
         </Pressable>
-        
-        <Image style={{width:245/411*window.width, height:548/867*window.height, objectFit:'fill', position:'absolute', top:200, left:10}} source={require('./assets/board.png')} />
 
-        <View style={{display:'flex', justifyContent:'space-between', flexDirection:'column', top:180, height:542/867*window.height}}>
+        
+        <Ticket ingredients={generatedIngredients} ticketNum={ticketNum} ticketPos={ticketPos}/>
+        
+
+        <View style={{display:'flex', justifyContent:'space-between', flexDirection:'column', top:ingPos, height:542/867*window.height, zIndex:-1}}>
           <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left: 286}} source={require('./assets/bunStack.png')} />
           <Draggable shouldReverse onPressIn={() => setSelected('Top Bun')} onDrag={handleDrag}>
-            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left: 286}} source={require('./assets/bunStack.png')} />
+            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left: 286}} source={require('./assets/bun.png')} />
           </Draggable>
 
           <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286}} source={require('./assets/lettuceStack.png')} />
           <Draggable shouldReverse onPressIn={() => setSelected('Lettuce')} onDrag={handleDrag}>
-            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 67}} source={require('./assets/lettuceStack.png')} />
+            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 67}} source={require('./assets/lettuce.png')} />
           </Draggable>
 
           <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, bottom:3}} source={require('./assets/onionStack.png')} />
           <Draggable shouldReverse onPressIn={() => setSelected('Onion')} onDrag={handleDrag}>
-            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 132}} source={require('./assets/onionStack.png')} />
+            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 132}} source={require('./assets/onion.png')} />
           </Draggable>
 
           <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286}} source={require('./assets/cheeseStack.png')} />
           <Draggable shouldReverse onPressIn={() => setSelected('Cheese')} onDrag={handleDrag}>
-            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 202}} source={require('./assets/cheeseStack.png')} />
+            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 202}} source={require('./assets/cheese.png')} />
           </Draggable>
 
           <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286}} source={require('./assets/pattyStack.png')} />
           <Draggable shouldReverse onPressIn={() => setSelected('Patty')} onDrag={handleDrag}>
-            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 269}} source={require('./assets/pattyStack.png')} />
+            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 269}} source={require('./assets/patty.png')} />
           </Draggable>
 
           <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286}} source={require('./assets/tomatoStack.png')} />
           <Draggable shouldReverse onPressIn={() => setSelected('Tomato')} onDrag={handleDrag}>
-            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 337}} source={require('./assets/tomatoStack.png')} />
+            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 337}} source={require('./assets/tomato.png')} />
           </Draggable>
 
           <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286}} source={require('./assets/botBunStack.png')} />
           <Draggable shouldReverse onPressIn={() => setSelected('Bottom Bun')} onDrag={handleDrag}>
-            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 404}} source={require('./assets/botBunStack.png')} />
+            <Image style={{width:90/411*window.width, height:66/867*window.height, objectFit:'fill', left:286, top: 404}} source={require('./assets/botBun.png')} />
           </Draggable>
         </View>
 
-        <View style={{display:'flex', justifyContent:'space-around', top:220, flexDirection:'row', left:-4}}>
-          <Pressable onPress={handleWrongClick}>
-            <Image style={{width:170/411*window.width, height:91/867*window.height, objectFit:'fill'}} source={require('./assets/btnWrong.png')} />
-          </Pressable>
-          <Pressable onPress={() => {handleButtonClick(); setTicketNum(ticketNum + 1)}}>
-            <Image style={{width:170/411*window.width, height:91/867*window.height, objectFit:'fill'}} source={require('./assets/btnRight.png')} />
-          </Pressable>
+                                                                                                                                  
+
+        <View style={{width:245/411*window.width, height:450/867*window.height, position:'absolute', zIndex:-1, top:235, left:80, flex:1, flexDirection:'column-reverse', justifyContent:'flex-start'}}>
+        {onBoard.map((ingredient, index) => (
+                                <View key={index}>
+                                    <Image style={{width: 90/411*window.width, height: 66/867*window.height, objectFit: 'fill', left: 5}} source={imageSource[ingredient]}/>
+                                </View>
+                            ))}
+        </View>
+
+        <Image style={{width:245/411*window.width, height:548/867*window.height, objectFit:'fill', position:'absolute', top:boardPos, left:10, zIndex:-2}} source={require('./assets/board.png')} />
+        
+
+        <View style={{display:'flex', justifyContent:'space-around', top:buttonPos, flexDirection:'row', left:-4}}>
+        <Pressable onPress={() => setOnBoard([])}>
+        <Image style={{width:170/411*window.width, height:91/867*window.height, objectFit:'fill'}} source={require('./assets/btnWrong.png')} />
+        </Pressable>
+        <Pressable onPress={handleRightClick}>
+        <Image style={{width:170/411*window.width, height:91/867*window.height, objectFit:'fill'}} source={require('./assets/btnRight.png')} />
+        </Pressable>
+                                                                                                           
         </View>      
 
         <View style={{width: 125/411*window.width, height: 580/867*window.height, position:'absolute', zIndex: 1, top: 150, left: 70, flex: 1, flexDirection: 'column-reverse', justifyContent: 'flex-start', alignItems: 'center'}}>
@@ -170,7 +280,6 @@ export default function App({navigation}) {
           ))}
         </View>
 
-        <Ticket ingredients={generatedIngredients} ticketNum={ticketNum}/>
 
         <View>
           {instructions && (
